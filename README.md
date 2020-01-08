@@ -1,2 +1,2 @@
 # choochoo
-:train:A command-line client for nztrain
+A command-line client for nztrain
