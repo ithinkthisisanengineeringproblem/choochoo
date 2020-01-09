@@ -37,4 +37,4 @@ async function getAuthenticationToken(username, password) {
 	return [signin.headers.get('set-cookie').substr(12, 32), atoken]; // First is the session_id cookie and second is the Authenticity token.
 }
 
-export { getAuthenticationToken };
+export default getAuthenticationToken;
