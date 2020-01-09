@@ -29,10 +29,12 @@ async function getAuthenticationToken(username, password) {
 			'Referer': 'https://train.nzoi.org.nz',
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'Host': 'train.nzoi.org.nz',
-			'Cookie': `expanded=false;_session_id=${sessionid}`
+			'Cookie': `expanded=false;_session_id=${sessionid}`,
+			'User-Agent': USER_AGENT
 		}
 
 	});
-	return signin.headers.get('set-cookie').substr(12, 32);
+	return [signin.headers.get('set-cookie').substr(12, 32), atoken]; // First is the session_id cookie and second is the Authenticity token.
 }
 
+export { getAuthenticationToken };
