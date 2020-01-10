@@ -1,6 +1,6 @@
 import { existsSync, readJsonSync, writeJsonSync, ensureDirSync, ensureFileSync } from "https://deno.land/std/fs/mod.ts";
 
-const DATA_STORE_DIR = Deno.dir() + './.choochoo/';
+const DATA_STORE_DIR = Deno.dir("home") + './.choochoo/';
 const DATA_STORE_LOCATION = DATA_STORE_DIR + 'config.json';
 
 export default class DataStore {
