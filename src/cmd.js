@@ -23,7 +23,7 @@ if(!ds.get("session_id")) {
 	api = new TrainApi();
 } else {
 	try {
-		api.init(...ds.get("session_id"));
+		api.init(ds.get("session_id")[]);
 	} catch (e) {
 		console.error(`An error occured:\n${e}`);
 	}
