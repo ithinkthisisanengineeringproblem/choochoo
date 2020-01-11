@@ -1,8 +1,7 @@
 const USER_AGENT = "choochoo"
 
-async function getUnauthSessionId() {
-	let res = await fetch("https://train.nzoi.org.nz");
-	console.log(res.headers.get('set-cookie').substr(12, 32));
+async function getUnauthSessionId(res) {
+	return res.headers.get('set-cookie').substr(12, 32);
 }
 
 async function getAuthenticityToken(doc) {
@@ -11,8 +10,9 @@ async function getAuthenticityToken(doc) {
 }
 
 async function getAuthenticationToken(username, password) {
-	let sessionid = getUnauthSessionId();
-	let doc = await(await fetch("https://train.nzoi.org.nz/accounts/sign_in")).text();
+	let res = await fetch("https://train.nzoi.org.nz/accounts/sign_in");
+	let doc = await res.text();
+	let sessionid = getUnauthSessionId(res);
 	let atoken = getAuthenticityToken(doc);
 	let form = new FormData();
 	form.append('utf8', '✓');
@@ -34,7 +34,7 @@ async function getAuthenticationToken(username, password) {
 		}
 
 	});
-	return [signin.headers.get('set-cookie').substr(12, 32), atoken]; // First is the session_id cookie and second is the Authenticity token.
+	return signin.headers.get('set-cookie').substr(12, 32); // First is the session_id cookie and second is the Authenticity token.
 }
 
-export default getAuthenticationToken;
+export { getAuthenticityToken, getAuthenticationToken};

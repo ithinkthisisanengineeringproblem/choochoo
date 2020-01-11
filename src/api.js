@@ -1,4 +1,4 @@
-import getAuthenticationToken from "./login.js";
+import { getAuthenticationToken, getAuthenticityToken } from "./login.js";
 
 class MultipartEncoder {
 	constructor(boundary = "alfsdjaliserulzdkvcasaroeauwidasjf") {
@@ -42,32 +42,29 @@ export default class TrainApi {
 		if(b == undefined) {
 			this.login(a, b);
 		} else {
-			this.sessionIds = a;
+			this.sessionId = a;
 		}
 	}
 	async login(username, password) {
-		this.sessionIds = getAuthenticationToken(username, password);
-	}
-
-	async getHome() {
-
+		this.sessionId = getAuthenticationToken(username, password);
 	}
 
 	async submitProgram(id, lang_id, prog_name, prog) {
+		let res = await fetch(`https://train.nzoi.org.nz/problems/${id}/submit`);
 		let form = new MultipartEncoder();
 		form.append('utf', '✓');
-		form.append('authenticity_token', sessionIds[1]);
+		form.append('authenticity_token', getAuthenticityToken(res));
 		form.append('submission[language_id]', lang_id);
 		form.append('submission[source_file]', prog, prog_name, 'text/x-c++src'); // Replace x-c++src with the actually mime type for the langauge that we are using. Perhaps we can derive this from language id.
 		form.append('commit', 'Submit');
-		let res = await fetch(`https://train.nzoi.org.nz/problems/${id}/submit`, {
+		let post = await fetch(`https://train.nzoi.org.nz/problems/${id}/submit`, {
 			method: "POST",
 			body: form.encode(),
 			headers: {
 				'Referer' : 'https://train.nzoi.org.nz',
 				//'Content-Type': 'multipart/formdata', // Not needed, this is added in the form encoder.
 				'Host': 'train.nzoi.org.nz',
-				'Cookie': `_session_id=${this.sessionIds[0]}`
+				'Cookie': `_session_id=${this.sessionId}`
 			}
 		})
 	}
