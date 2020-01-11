@@ -1,10 +1,10 @@
 const USER_AGENT = "choochoo"
 
-async function getUnauthSessionId(res) {
-	return res.headers.get('set-cookie').substr(12, 32);
+function getUnauthSessionId(res) {
+	return res.headers.get('Set-Cookie').substr(12, 32);
 }
 
-async function getAuthenticityToken(doc) {
+function getAuthenticityToken(doc) {
 	let pos = doc.search("name=\"csrf-token\"");
 	return doc.substr(pos - 46, 44)
 }
@@ -14,27 +14,41 @@ async function getAuthenticationToken(username, password) {
 	let doc = await res.text();
 	let sessionid = getUnauthSessionId(res);
 	let atoken = getAuthenticityToken(doc);
+	console.log(`sessionid is ${sessionid.length}`)
+	console.log(`atoken is ${atoken}`);
 	let form = new FormData();
 	form.append('utf8', '✓');
 	form.append('authenticity_token', atoken);
 	form.append('user[email]', username);
 	form.append('user[password]', password);
 	form.append('user[remember_me]', '0');
-	form.append('commit', "Sign+in");
 	console.log('created form data');
+	let params = new URLSearchParams(form);
+	console.log(`params are ${params}`)
 	let signin = await fetch("https://train.nzoi.org.nz/accounts/sign_in", {
 		method: "POST",
-		body: new URLSearchParams(form),
+		body: params + '&commit=Sign+in',
+		credentials: 'include',
+		referrer: 'https://train.nzoi.org.nz/accounts/sign_in',
 		headers: {
-			'Referer': 'https://train.nzoi.org.nz',
+			'Referer': 'https://train.nzoi.org.nz/accounts/sign_in',
+			'Origin': 'https://train.nzoi.org.nz',
 			'Content-Type': 'application/x-www-form-urlencoded',
+			'Credentials': 'include',
 			'Host': 'train.nzoi.org.nz',
-			'Cookie': `expanded=false;_session_id=${sessionid}`,
-			'User-Agent': USER_AGENT
+			'Cookie': `expanded=false; _session_id=${sessionid}`,
+			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+			"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:72.0) Gecko/20100101 Firefox/72.0"
 		}
 
 	});
-	return signin.headers.get('set-cookie').substr(12, 32); // First is the session_id cookie and second is the Authenticity token.
+	console.log(`The status code is ${signin.status}`)
+	console.log(`res type is ${res.type} and the url is ${res.url}`)
+	for(let pair of signin.headers.entries()) {
+		console.log(`${pair[0]}: ${pair[1]}`);
+	}
+	//console.log(await res.text());
+	return signin.headers.get('Set-Cookie').substr(12, 32);
 }
 
 export { getAuthenticityToken, getAuthenticationToken};

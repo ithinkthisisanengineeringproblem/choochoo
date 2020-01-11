@@ -1,3 +1,3 @@
 import CommandLine from './src/cmd.js';
 
-CommandLine(Deno.args);
+await CommandLine(Deno.args);

@@ -1,6 +1,7 @@
 import TrainApi from "./api.js";
 import DataStore from "./datastore.js";
 import getInput from "./prompt.js"
+import { input as readline } from "https://raw.githubusercontent.com/johnsonjo4531/read_lines/v3.0.1/input.ts";
 
 function ErrorQuit(e, code = 1) {
 	console.error(e);
@@ -40,7 +41,7 @@ function checkLoggedIn() {
 	return false;
 }
 
-export default function CommandLine(input) {
+export default async function CommandLine(input) {
 	switch(input[0]) {
 		case "login":
 			if(checkLoggedIn()) {
@@ -49,13 +50,15 @@ export default function CommandLine(input) {
 			} else {
 				try {
 					console.log("Please note that due to current limitation in deno, your password will be echoed to stdout. View this related issue about deno not providing a raw mode on Github: https://github.com/denoland/deno/issues/3614.");
-					let username = getInput(Deno.stdin, Deno.stdout, "Username: ");
-					let password = getInput(Deno.stdin, Deno.stdout, "Password: ");
+					let username = await readline("Username: ");
+					let password = await readline("Password: ");
+					console.log(`${username.length} ${password.length}`);
 					api.login(username, password);
 				} catch(e) {
 					ErrorQuit(`Could not login. Are your username and password correct? The error was:\n${e}`);
 				}
 			}
+			break;
 		default:
 			console.log('choochoo v0.0.1.');
 			break;

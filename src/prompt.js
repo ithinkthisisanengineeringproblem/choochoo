@@ -1,10 +1,14 @@
-import TextProtoReader from "https://deno.land/std/textproto/mod.ts";
-import BufReader from "https://deno.land/std/io/mod.ts";
+import  { TextProtoReader } from "https://deno.land/std/textproto/mod.ts";
+import { BufReader } from "https://deno.land/std/io/mod.ts";
 
 export default async function getInput(cin, cout, prompt) {
 	const encoder = new TextEncoder();
 	cout.write(encoder.encode(prompt));
-	return getLine(cin);
+	const {value, done} = await getLine(cin);
+	if(done) {
+		return "didn't read anything";
+	}
+	return value;
 }
 
 async function* getLine(cin) {
