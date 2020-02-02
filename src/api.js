@@ -40,13 +40,17 @@ export default class TrainApi {
 
 	init(a, b = undefined) {
 		if(b == undefined) {
-			this.login(a, b);
-		} else {
 			this.sessionId = a;
+		} else {
+			this.login(a, b);
 		}
 	}
 	async login(username, password) {
-		this.sessionId = getAuthenticationToken(username, password);
+		this.sessionId = await getAuthenticationToken(username, password);
+	}
+
+	getSessionId() {
+		return this.sessionId;
 	}
 
 	async submitProgram(id, lang_id, prog_name, prog) {

@@ -19,7 +19,8 @@ export default class DataStore {
 			ensureFileSync(DATA_STORE_LOCATION);
 			writeJsonSync(DATA_STORE_LOCATION, {
 				defaultLanguage: 'c++11',
-				currentProblem: '73'
+				currentProblem: '73',
+				session_id: ""
 			});
 		} catch (e) {
 			throw `Could not create the data store. The error was ${e}`;
