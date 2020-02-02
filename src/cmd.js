@@ -1,5 +1,6 @@
 import TrainApi from "./api.js";
 import DataStore from "./datastore.js";
+import Files from "./files.js";
 import { input as readline } from "https://raw.githubusercontent.com/johnsonjo4531/read_lines/v3.0.1/input.ts";
 
 function ErrorQuit(e, code = 1) {
@@ -64,8 +65,22 @@ export default async function CommandLine(input) {
 			}
 			console.log(ds.get("session_id"));
 			break;
+		case "submit":
+			if(!checkLoggedIn()) {
+				console.log("You must login before you can submit a program");
+			}
+			const path = input[1];
+			const problem = input[2];
+			const prog = `#include<iostream>
+using namespace std;
+
+int main() {
+	cout << "Hello, world!";
+}`
+			api.submitProgram(73, 11, "hello-world.cpp", prog)
+			break;
 		default:
-			console.log('choochoo v0.0.1.');
+			console.log('choochoo v0.0.2.');
 			break;
 	}
 }

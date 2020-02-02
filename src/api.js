@@ -10,14 +10,15 @@ class MultipartEncoder {
 		this.values.push({
 			"name": name,
 			"value": value,
-			"filename": filename
+			"filename": filename,
+			"contentType": contentType
 		});
 	}
 
 	encode() {
 		let body = "";
 		body += `Content-Type: multipart/form-data; boundary=${this.boundary}\n`;
-		for(item in this.values) {
+		for(const item in this.values) {
 			body += `--${this.boundary}\n`;
 			if(!item.filename) { // This is a key-value pair, not a file.
 				body += `Content-Disposition: form-data; name=${item.name}\n\n`;
@@ -42,6 +43,7 @@ export default class TrainApi {
 		if(b == undefined) {
 			this.sessionId = a;
 		} else {
+			console.log('logging in');
 			this.login(a, b);
 		}
 	}
@@ -55,15 +57,17 @@ export default class TrainApi {
 
 	async submitProgram(id, lang_id, prog_name, prog) {
 		let res = await fetch(`https://train.nzoi.org.nz/problems/${id}/submit`);
+		//console.log(`res status is ${await res.text()}`);
 		let form = new MultipartEncoder();
 		form.append('utf', '✓');
-		form.append('authenticity_token', getAuthenticityToken(res));
+		form.append('authenticity_token', getAuthenticityToken(await res.text()));
 		form.append('submission[language_id]', lang_id);
 		form.append('submission[source_file]', prog, prog_name, 'text/x-c++src'); // Replace x-c++src with the actually mime type for the langauge that we are using. Perhaps we can derive this from language id.
 		form.append('commit', 'Submit');
 		let post = await fetch(`https://train.nzoi.org.nz/problems/${id}/submit`, {
 			method: "POST",
 			body: form.encode(),
+			redirect: "nofollow",
 			headers: {
 				'Referer' : 'https://train.nzoi.org.nz',
 				//'Content-Type': 'multipart/formdata', // Not needed, this is added in the form encoder.
@@ -71,5 +75,6 @@ export default class TrainApi {
 				'Cookie': `_session_id=${this.sessionId}`
 			}
 		})
+		console.log(`${post.url}`)
 	}
 };
